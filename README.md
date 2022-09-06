@@ -109,16 +109,18 @@ $ direnv allow
 Now deploy to a network like so:
 
 ```
-$ yarn deploy rinkeby
+yarn deploy rinkeby
+yarn deploy mainnet
+yarn deploy fuji
+yarn deploy avalanche
 ```
 
 It will update the `deployments/` dir.
 
 ## TODO
 
-[ ] Item1
-[ ] Item2
-
+- [ ] Item1
+- [ ] Item2
 
 ## Contributing
 
