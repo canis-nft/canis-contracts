@@ -12,3 +12,4 @@ artifacts
 abis/
 
 .DS_Store
+*.car
