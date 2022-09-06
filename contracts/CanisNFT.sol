@@ -6,18 +6,19 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract HuskyArt is ERC721, ERC721URIStorage, Ownable {
+contract CanisNFT is ERC721, ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIdCounter;
 
-    constructor() ERC721("HuskyArt", "HSA") {}
+    constructor() ERC721("Canis", "CAN") {}
 
     function _baseURI() internal pure override returns (string memory) {
         return "https://example.com/nft/";
     }
 
     function safeMint(address to, string memory uri) public onlyOwner {
+        require(balanceOf(to) == 0, "OWNER CANNOT HAVE MORE THAN ONCE NFT");
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
@@ -30,12 +31,7 @@ contract HuskyArt is ERC721, ERC721URIStorage, Ownable {
         super._burn(tokenId);
     }
 
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        override(ERC721, ERC721URIStorage)
-        returns (string memory)
-    {
+    function tokenURI(uint256 tokenId) public view override(ERC721, ERC721URIStorage) returns (string memory) {
         return super.tokenURI(tokenId);
     }
 }
