@@ -34,10 +34,13 @@ function displayResult(name, result) {
 
 const chainName = (chainId) => {
     switch(chainId) {
+      case 1: return 'Mainnet';
       case 3: return 'Ropsten';
       case 4: return 'Rinkeby';
       case 42: return 'Kovan';
       case 31337: return 'HardhatEVM';
+      case 43113: return 'Fuji'
+      case 43114: return "Avalanche"
       case 80001: return 'Mumbai';
       default: return 'Unknown';
     }

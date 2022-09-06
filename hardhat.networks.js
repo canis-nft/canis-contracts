@@ -1,8 +1,8 @@
 const accounts = process.env.PRIVATE_KEY
   ? [process.env.PRIVATE_KEY]
   : {
-      mnemonic: process.env.HDWALLET_MNEMONIC
-    }
+    mnemonic: process.env.HDWALLET_MNEMONIC
+  }
 
 const networks = {
   coverage: {
@@ -40,8 +40,20 @@ if (process.env.HDWALLET_MNEMONIC || process.env.PRIVATE_KEY) {
   networks.mumbai = {
     chainId: 80001,
     url: 'https://rpc-mumbai.maticvigil.com',
-    accounts
-  }
+    accounts,
+  };
+
+  networks.avalache = {
+    chainId: 43114,
+    url: 'https://api.avax.network/ext/bc/C/rpc',
+    accounts,
+  };
+
+  networks.fuji = {
+    chainId: 43113,
+    url: 'https://api.avax-test.network/ext/bc/C/rpc',
+    accounts,
+  };
 }
 
 if (process.env.POLYGONSCAN_API_KEY && (process.env.HDWALLET_MNEMONIC || process.env.PRIVATE_KEY)) {
