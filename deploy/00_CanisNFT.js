@@ -20,7 +20,7 @@ module.exports = async (hardhat) => {
 
   cyan('\nDeploying MyNFT...')
   const CanisNFTResult = await deploy(ContractName, {
-    args: [],
+    args: [300],
     contract: ContractName,
     from: deployer,
     skipIfAlreadyDeployed: false
