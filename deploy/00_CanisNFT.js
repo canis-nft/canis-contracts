@@ -8,9 +8,9 @@ module.exports = async (hardhat) => {
   const {deployer} = await getNamedAccounts()
 
   const {cap, tokenUri, name, symbol} = {
-    cap: !process.env.TOKEN_SUPPLY ? 300 : process.env.TOKEN_SUPPLY,
+    cap: !process.env.TOKEN_SUPPLY ? 3 : process.env.TOKEN_SUPPLY,
     tokenUri: !process.env.TOKEN_URI
-      ? 'https://bafybeiahsj6so2jofeadwprofvphxo6g5d662xwzolztg6xgs3g4qa4vvi.ipfs.nftstorage.link/metadata'
+      ? 'https://bafybeiahsj6so2jofeadwprofvphxo6g5d662xwzolztg6xgs3g4qa4vvi.ipfs.nftstorage.link/metadata/'
       : process.env.TOKEN_URI,
     name: !process.env.NFT_NAME ? 'CanisNFT' : process.env.NFT_NAME,
     symbol: !process.env.NFT_SYMBOL ? 'CAN' : process.env.NFT_SYMBOL
