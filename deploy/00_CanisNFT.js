@@ -18,7 +18,7 @@ module.exports = async (hardhat) => {
   dim(`network: ${chainName(chainId)} (${isTestEnvironment ? 'local' : 'remote'})`)
   dim(`deployer: ${deployer}`)
 
-  cyan('\nDeploying MyNFT...')
+  cyan(`\nDeploying ${ContractName}...`)
   const CanisNFTResult = await deploy(ContractName, {
     args: [300],
     contract: ContractName,

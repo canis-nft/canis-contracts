@@ -1,4 +1,4 @@
-const {getNamedAccounts} = require('hardhat')
+const chalk = require('chalk')
 const {getCanisNFT} = require('../utils/helpers')
 const {dim, green, yellow} = require('../utils/utils')
 
@@ -8,13 +8,12 @@ async function main() {
     return 1
   } else {
     dim(`------- MINTING NFT TO ${process.env.TO} -------`)
-    const {deployer} = await getNamedAccounts()
-    const CanisNFT = await getCanisNFT(deployer)
-    const tx = await CanisNFT.mint(process.env.TO)
+    const CanisNFT = await getCanisNFT(process.env.CANISNFT_ADDRESS)
+    const tx = await CanisNFT.safeMint(process.env.TO)
     yellow('------- AWAITING TRANSACTION -------')
     const txResult = await tx.wait()
     green('------- NFT MINTED SUCCESSFULLY -------')
-    green(txResult)
+    console.log(txResult)
   }
 }
 

@@ -18,16 +18,22 @@ contract CanisNFT is ERC721, ERC721URIStorage, Ownable {
     }
 
     function _baseURI() internal pure override returns (string memory) {
-        return "https://bafybeia4wkas27dxzaqa65fey46m2iuantfxikqhjmlmxui7ii6se7aslq.ipfs.nftstorage.link/metadata/";
+        return "https://bafybeiahsj6so2jofeadwprofvphxo6g5d662xwzolztg6xgs3g4qa4vvi.ipfs.nftstorage.link/metadata/";
     }
 
-    function safeMint(address to, string memory uri) public onlyOwner {
+    /**
+     * It starts from one.
+     */
+    function safeMint(address to) public onlyOwner returns (uint256) {
         require(balanceOf(to) == 0, "OWNER CANNOT HAVE MORE THAN ONCE NFT");
         uint256 tokenId = _tokenIdCounter.current();
-        require((tokenId + 1) <= _cap, "NFTCAPPED: cap exceeded");
+        require(tokenId <= _cap, "NFTCAPPED: cap exceeded");
+
         _tokenIdCounter.increment();
-        _safeMint(to, tokenId);
-        _setTokenURI(tokenId, uri);
+        uint256 newTokenId = _tokenIdCounter.current();
+        _safeMint(to, newTokenId);
+
+        return newTokenId;
     }
 
     // The following functions are overrides required by Solidity.

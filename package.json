@@ -23,6 +23,7 @@
     "size-contracts": "hardhat size-contracts",
     "deploy:node": "hardhat --config hardhat.config.js deploy --deploy-scripts scripts --write true --network",
     "deploy": "npx hardhat deploy",
+    "deploy:rinkeby": "npx hardhat deploy --network rinkeby --reset",
     "docgen": "hardhat docgen",
     "ipfs:images": "npx ipfs-car --pack images --output images.car",
     "ipfs:metadata": "npx ipfs-car --pack metadata --output metadata.car"
