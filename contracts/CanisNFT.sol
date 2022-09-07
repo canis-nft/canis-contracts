@@ -7,37 +7,56 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract CanisNFT is ERC721, ERC721URIStorage, Ownable {
-    uint256 public immutable _cap;
+    uint256 public CAP;
+    string public baseTokenUri;
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIdCounter;
 
-    constructor(uint256 cap_) ERC721("Canis", "CAN") {
+    event Initialized(uint256 cap, string tokenUri, string name, string symbol);
+    event CAPUpdated(uint256 oldCap, uint256 newCap);
+
+    constructor(
+        uint256 cap_,
+        string memory _baseTokenUri,
+        string memory name,
+        string memory symbol
+    ) ERC721(name, symbol) {
         require(cap_ > 0, "NFTCapped: cap is 0");
-        _cap = cap_;
+        CAP = cap_;
+        baseTokenUri = _baseTokenUri;
+        emit Initialized(CAP, baseTokenUri, name, symbol);
     }
 
-    function _baseURI() internal pure override returns (string memory) {
-        return "https://bafybeiahsj6so2jofeadwprofvphxo6g5d662xwzolztg6xgs3g4qa4vvi.ipfs.nftstorage.link/metadata/";
+    /********** GETTERS ***********/
+
+    function _baseURI() internal view override returns (string memory) {
+        return baseTokenUri;
     }
 
-    /**
-     * It starts from one.
-     */
-    function safeMint(address to) public onlyOwner returns (uint256) {
-        require(balanceOf(to) == 0, "OWNER CANNOT HAVE MORE THAN ONCE NFT");
+    /********** SETTERS ***********/
+    function setCap(uint256 _newCap) public onlyOwner {
+        uint256 oldCap = CAP;
+        require(CAP > 0, "NFTCapped: cap is 0");
+        CAP = _newCap;
+        emit CAPUpdated(oldCap, _newCap);
+    }
+
+    /********** INTERFACE ***********/
+
+    function safeMint() external returns (uint256) {
+        require(balanceOf(msg.sender) == 0, "OWNER CANNOT HAVE MORE THAN ONCE NFT");
         uint256 tokenId = _tokenIdCounter.current();
-        require(tokenId <= _cap, "NFTCAPPED: cap exceeded");
+        require(tokenId < CAP, "NFTCAPPED: cap exceeded");
 
         _tokenIdCounter.increment();
         uint256 newTokenId = _tokenIdCounter.current();
-        _safeMint(to, newTokenId);
+        _safeMint(msg.sender, newTokenId);
 
         return newTokenId;
     }
 
     // The following functions are overrides required by Solidity.
-
     function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
         super._burn(tokenId);
     }

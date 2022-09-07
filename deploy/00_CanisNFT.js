@@ -7,12 +7,19 @@ module.exports = async (hardhat) => {
   const {deploy} = deployments
   const {deployer} = await getNamedAccounts()
 
+  const {cap, tokenUri, name, symbol} = {
+    cap: !process.env.TOKEN_SUPPLY ? 300 : process.env.TOKEN_SUPPLY,
+    tokenUri: !process.env.TOKEN_URI ? '' : process.env.TOKEN_URI,
+    name: !process.env.NFT_NAME ? 'CanisNFT' : process.env.NFT_NAME,
+    symbol: !process.env.NFT_SYMBOL ? 'CAN' : process.env.NFT_SYMBOL
+  }
+
   const chainId = parseInt(await getChainId(), 10)
 
   const isTestEnvironment = chainId === 31337 || chainId === 1337
 
   dim('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-  dim('Blockchain Canis Contracts - Deploy CanisNFT')
+  dim(`Blockchain Canis Contracts - Deploy ${ContractName}`)
   dim('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n')
 
   dim(`network: ${chainName(chainId)} (${isTestEnvironment ? 'local' : 'remote'})`)
@@ -20,7 +27,7 @@ module.exports = async (hardhat) => {
 
   cyan(`\nDeploying ${ContractName}...`)
   const CanisNFTResult = await deploy(ContractName, {
-    args: [300],
+    args: [cap, tokenUri, name, symbol],
     contract: ContractName,
     from: deployer,
     skipIfAlreadyDeployed: false
