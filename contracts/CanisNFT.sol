@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract CanisNFT is ERC721, ERC721URIStorage, Ownable {
-    uint256 public CAP;
+    uint256 public immutable CAP;
     string public baseTokenUri;
     using Counters for Counters.Counter;
 
@@ -32,14 +32,6 @@ contract CanisNFT is ERC721, ERC721URIStorage, Ownable {
 
     function _baseURI() internal view override returns (string memory) {
         return baseTokenUri;
-    }
-
-    /********** SETTERS ***********/
-    function setCap(uint256 _newCap) public onlyOwner {
-        uint256 oldCap = CAP;
-        require(CAP > 0, "NFTCapped: cap is 0");
-        CAP = _newCap;
-        emit CAPUpdated(oldCap, _newCap);
     }
 
     /********** INTERFACE ***********/
