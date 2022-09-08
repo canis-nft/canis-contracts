@@ -44,19 +44,78 @@ describe('Canis NFT', function () {
     expect(owner).to.be.equal(expectedOwner)
   })
 
+  it('Should not create contract if cap is zero', async () => {
+    //GIVEN
+    const name = 'CanisNFT'
+    const symbol = 'CAN'
+    const cap = 0
+    const tokenURI = ''
+    //WHEN //THEN
+    await expect(this.CanisNFT.deploy(cap, tokenURI, name, symbol)).to.be.revertedWith('NFTCapped: cap is 0')
+  })
+
   it('Should be able to mint', async () => {
     //GIVEN
     const aliceInitialBalance = await this.canisNFT.balanceOf(this.alice.address)
     //WHEN
-    const tokenId = await this.canisNFT.connect(this.alice).safeMint()
+    await expect(this.canisNFT.connect(this.alice).safeMint())
+      .to.emit(this.canisNFT, 'Transfer')
+      .withArgs(ethers.constants.AddressZero, this.alice.address, 1)
     const aliceFinalBalance = await this.canisNFT.balanceOf(this.alice.address)
     //THEN
     expect(aliceInitialBalance).to.be.equal(0)
+    expect(aliceFinalBalance).to.be.equal(1)
   })
 
-  xit('Should be able to get tokenUri once token was minted', async () => {})
+  it('Should revert to get a not minted tokenUri', async () => {
+    //GIVEN
+    const bobInitialBalance = await this.canisNFT.balanceOf(this.bob.address)
+    expect(bobInitialBalance).to.be.equal(0)
+    //WHEN //THEN
+    await expect(this.canisNFT.connect(this.bob).tokenURI(2)).to.be.revertedWith('ERC721: invalid token ID')
+  })
 
-  xit('Should not mint if user has already one nft', async () => {})
+  it('Should be able to get tokenUri once token was minted', async () => {
+    //GIVEN
+    const expectedBaseTokenURI =
+      'https://bafybeiahsj6so2jofeadwprofvphxo6g5d662xwzolztg6xgs3g4qa4vvi.ipfs.nftstorage.link/metadata/'
+    const bobInitialBalance = await this.canisNFT.balanceOf(this.bob.address)
+    //WHEN
+    await this.canisNFT.connect(this.alice).safeMint()
+    await this.canisNFT.connect(this.bob).safeMint()
+    const bobFinalBalance = await this.canisNFT.balanceOf(this.bob.address)
+    const bobTokenURI = await this.canisNFT.tokenURI(2)
+    //THEN
+    expect(bobInitialBalance).to.be.equal(0)
+    expect(expectedBaseTokenURI + '2').to.be.equal(bobTokenURI)
+    expect(bobFinalBalance).to.be.equal(1)
+  })
 
-  xit('Should not be able to mint once gap limit is reached', async () => {})
+  it('Should not mint if user has already one nft', async () => {
+    //GIVEN
+    await this.canisNFT.connect(this.alice).safeMint()
+    const aliceBalance = await this.canisNFT.balanceOf(this.alice.address)
+    //WHEN
+    expect(aliceBalance).to.be.equal(1)
+    //THEN
+    await expect(this.canisNFT.connect(this.alice).safeMint()).to.be.revertedWith(
+      'CANISNFT: OWNER CANNOT HAVE MORE THAN ONE NFT'
+    )
+  })
+
+  it('Should not be able to mint once gap limit is reached', async () => {
+    //GIVEN
+    await this.canisNFT.connect(this.alice).safeMint()
+    await this.canisNFT.connect(this.bob).safeMint()
+    await this.canisNFT.connect(this.charly).safeMint()
+    //WHEN
+    const aliceBalance = await this.canisNFT.balanceOf(this.alice.address)
+    const bobBalance = await this.canisNFT.balanceOf(this.bob.address)
+    const charlyBalance = await this.canisNFT.balanceOf(this.charly.address)
+    //THEN
+    expect(aliceBalance).to.be.equal(1)
+    expect(bobBalance).to.be.equal(1)
+    expect(charlyBalance).to.be.equal(1)
+    await expect(this.canisNFT.safeMint()).to.be.revertedWith('NFTCAPPED: cap exceeded')
+  })
 })
