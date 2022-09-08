@@ -14,7 +14,6 @@ contract CanisNFT is ERC721, ERC721URIStorage, Ownable {
     Counters.Counter private _tokenIdCounter;
 
     event Initialized(uint256 cap, string tokenUri, string name, string symbol);
-    event CAPUpdated(uint256 oldCap, uint256 newCap);
 
     constructor(
         uint256 cap_,
@@ -37,7 +36,7 @@ contract CanisNFT is ERC721, ERC721URIStorage, Ownable {
     /********** INTERFACE ***********/
 
     function safeMint() external returns (uint256) {
-        require(balanceOf(msg.sender) == 0, "OWNER CANNOT HAVE MORE THAN ONCE NFT");
+        require(balanceOf(msg.sender) == 0, "CANISNFT: OWNER CANNOT HAVE MORE THAN ONE NFT");
         uint256 tokenId = _tokenIdCounter.current();
         require(tokenId < CAP, "NFTCAPPED: cap exceeded");
 
