@@ -118,4 +118,16 @@ describe('Canis NFT', function () {
     expect(charlyBalance).to.be.equal(1)
     await expect(this.canisNFT.safeMint()).to.be.revertedWith('NFTCAPPED: cap exceeded')
   })
+
+  it('Should be able to change owner', async () => {
+    //GIVEN
+    const currentOwner = await this.canisNFT.owner()
+    const newOwner = this.owner.address
+    //WHEN
+    await this.canisNFT.transferOwnership(newOwner)
+    const expectedNewOwner = await this.canisNFT.owner()
+    //THEN
+    expect(currentOwner).to.be.equal(this.deployer)
+    expect(newOwner).to.be.equal(expectedNewOwner)
+  })
 })
