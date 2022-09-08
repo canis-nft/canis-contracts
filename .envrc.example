@@ -24,3 +24,9 @@ export PATH_TO_GOVERNANCE_REPO=''
 
 # Used to deploy to testnets
 export PRIVATE_KEY=''
+
+# Used to deploy contract
+export TOKEN_SUPPLY=''
+export TOKEN_URI='' 
+export NFT_NAME=''
+export NFT_SYMBOL='' 

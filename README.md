@@ -23,6 +23,7 @@ yarn
 ### Development
 
 ### Compile
+
 ```sh
 yarn compile
 ```
@@ -30,8 +31,9 @@ yarn compile
 The Application Binary Interfaces (ABI) for all protocol's contracts and related contract are available in the `abis/` directory
 
 For instance, to pull in the MyContract ABI:
+
 ```javascript
-const MyContractABI = require('./abis/MyContract.json');
+const MyContractABI = require('./abis/MyContract.json')
 ```
 
 ### Testing
@@ -79,7 +81,7 @@ The artifacts are available in the `deployments/` directory. For example, to pul
 
 ```javascript
 const MyContract = require('./deployments/rinkeby/MyContract.json')
-const { abi, address, receipt } = MyContract
+const {abi, address, receipt} = MyContract
 ```
 
 ### Connect Locally
@@ -116,6 +118,20 @@ yarn deploy avalanche
 ```
 
 It will update the `deployments/` dir.
+
+### Uploading images and metadata to ipfs
+
+- Pack your images:
+
+```bash
+yarn ipfs:images
+```
+
+- Pack your metadata:
+
+```bash
+yarn ipfs:metadata
+```
 
 ## TODO
 

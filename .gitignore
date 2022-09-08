@@ -11,3 +11,6 @@ cache
 artifacts
 abis/
 
+.DS_Store
+*.car
+tasks.md
