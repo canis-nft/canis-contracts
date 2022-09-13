@@ -54,6 +54,7 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
         override
         returns (address receiver, uint256 royaltyAmount)
     {
+        require(tokenId < CAP, "CANISNFT: TOKEN ID DOES NOT EXIST");
         return super.royaltyInfo(tokenId, salePrice);
     }
 
@@ -69,11 +70,13 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
         address receiver,
         uint96 feeNumerator
     ) external onlyOwner {
+        require(tokenId < CAP, "CANISNFT: TOKEN ID DOES NOT EXIST");
         super._setTokenRoyalty(tokenId, receiver, feeNumerator);
         emit TokenRoyaltyUpdated(tokenId, receiver, feeNumerator);
     }
 
     function resetTokenRoyalty(uint256 tokenId) external onlyOwner {
+        require(tokenId < CAP, "CANISNFT: TOKEN ID DOES NOT EXIST");
         super._resetTokenRoyalty(tokenId);
         emit TokenRoyaltyReseted(tokenId);
     }
