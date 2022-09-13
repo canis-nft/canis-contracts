@@ -22,6 +22,9 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
         address defaultRoyaltyReceiver,
         uint96 defaultFeeNumerator
     );
+    event DefaultRoyaltyUpdated(address indexed royaltyReceiver, uint96 feeNumerator);
+    event TokenRoyaltyUpdated(uint256 indexed tokenId, address indexed receiver, uint96 feeNumerator);
+    event TokenRoyaltyReseted(uint256 indexed tokenId);
 
     constructor(
         uint256 cap_,
@@ -54,9 +57,30 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
         return super.royaltyInfo(tokenId, salePrice);
     }
 
+    /********** GETTERS ***********/
+
+    function setDefaultRoyalty(address receiver, uint96 feeNumerator) external onlyOwner {
+        super._setDefaultRoyalty(receiver, feeNumerator);
+        emit DefaultRoyaltyUpdated(receiver, feeNumerator);
+    }
+
+    function setTokenRoyalty(
+        uint256 tokenId,
+        address receiver,
+        uint96 feeNumerator
+    ) external onlyOwner {
+        super._setTokenRoyalty(tokenId, receiver, feeNumerator);
+        emit TokenRoyaltyUpdated(tokenId, receiver, feeNumerator);
+    }
+
+    function resetTokenRoyalty(uint256 tokenId) external onlyOwner {
+        super._resetTokenRoyalty(tokenId);
+        emit TokenRoyaltyReseted(tokenId);
+    }
+
     /********** INTERFACE ***********/
 
-    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721, ERC2981) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC2981) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 
