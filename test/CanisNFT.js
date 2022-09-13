@@ -14,6 +14,7 @@ describe('Canis NFT', function () {
     this.alice = signers[1]
     this.bob = signers[2]
     this.charly = signers[3]
+    this.royaltyReceiver = signers[4]
     this.CanisNFT = await ethers.getContractFactory('CanisNFT')
   })
 
@@ -50,8 +51,12 @@ describe('Canis NFT', function () {
     const symbol = 'CAN'
     const cap = 0
     const tokenURI = ''
+    const royaltyReciever = this.deployer
+    const feeNumerator = 10
     //WHEN //THEN
-    await expect(this.CanisNFT.deploy(cap, tokenURI, name, symbol)).to.be.revertedWith('NFTCapped: cap is 0')
+    await expect(this.CanisNFT.deploy(cap, tokenURI, name, symbol, royaltyReciever, feeNumerator)).to.be.revertedWith(
+      'NFTCapped: cap is 0'
+    )
   })
 
   it('Should be able to mint', async () => {
@@ -129,5 +134,93 @@ describe('Canis NFT', function () {
     //THEN
     expect(currentOwner).to.be.equal(this.deployer)
     expect(newOwner).to.be.equal(expectedNewOwner)
+  })
+
+  it('Should set default token royalty', async () => {
+    //GIVEN
+    const royaltyReceiver = this.royaltyReceiver.address
+    const feeNumerator = 100
+    //WHEN //THEN
+    await expect(this.canisNFT.setDefaultRoyalty(royaltyReceiver, feeNumerator))
+      .to.emit(this.canisNFT, 'DefaultRoyaltyUpdated')
+      .withArgs(royaltyReceiver, feeNumerator)
+  })
+
+  it('If not set, royalty info should return constructor values', async () => {
+    //GIVEN //WHEN
+    const tokenId = 0
+    const salePrice = 1000
+    const {receiver, royaltyAmount} = await this.canisNFT.royaltyInfo(tokenId, salePrice)
+    //THEN
+    expect(receiver).to.be.equal(this.deployer)
+    expect(royaltyAmount).to.be.equal(0)
+  })
+
+  it('Should be able to get default token royalty for a non-minted token', async () => {
+    //GIVEN
+    const expectedRoyaltyReceiver = this.royaltyReceiver.address
+    const expectedFeeNumerator = '10'
+    await this.canisNFT.setDefaultRoyalty(expectedRoyaltyReceiver, expectedFeeNumerator)
+    //WHEN
+    const tokenId = 0
+    const salePrice = 1000
+    const {receiver, royaltyAmount} = await this.canisNFT.royaltyInfo(tokenId, salePrice)
+    //THEN
+    expect(receiver).to.be.equal(expectedRoyaltyReceiver)
+    expect(royaltyAmount).to.be.equal('1')
+  })
+
+  it('Should be able to get token default royalty for minted token', async () => {
+    //GIVEN
+    await this.canisNFT.connect(this.alice).safeMint()
+    const salePrice = 10
+    //WHEN
+    const {receiver, royaltyAmount} = await this.canisNFT.royaltyInfo(0, salePrice)
+    //THEN
+    expect(receiver).to.be.equal(this.deployer)
+    expect(royaltyAmount).to.be.equal('0')
+  })
+
+  it('Should be able to set custom royalty', async () => {
+    //GIVEN
+    const defaultRoyaltyReceiver = this.deployer
+    const customRoyaltyReceiver = this.royaltyReceiver.address
+    const customFeeNumerator = 10
+    const salePrice = 1000
+    //WHEN
+    const {receiver: defaultReceiver, royaltyAmount: defaultRoyaltyAmount} = await this.canisNFT.royaltyInfo(
+      1,
+      salePrice
+    )
+    await this.canisNFT.setTokenRoyalty(0, customRoyaltyReceiver, customFeeNumerator)
+    const {receiver: customReceiver, royaltyAmount: customRoyalty} = await this.canisNFT.royaltyInfo(0, salePrice)
+    //THEN
+    expect(defaultReceiver).to.be.equal(defaultRoyaltyReceiver)
+    expect(defaultRoyaltyAmount).to.be.equal(0)
+    expect(customReceiver).to.be.equal(customRoyaltyReceiver)
+    expect(customRoyalty).to.be.equal(1)
+  })
+
+  it('Should be able to reset token royalty for a token', async () => {
+    //GIVEN
+    const {receiver: initialRoyaltyReceiver, royaltyAmount: initialRoyaltyAmount} = await this.canisNFT.royaltyInfo(
+      0,
+      10
+    )
+    await this.canisNFT.setTokenRoyalty(0, this.royaltyReceiver.address, '10')
+    const {receiver: updatedRoyaltyReceiver, royaltyAmount: updatedRoyaltyAmount} = await this.canisNFT.royaltyInfo(
+      0,
+      1000
+    )
+    //WHEN
+    await this.canisNFT.resetTokenRoyalty(0)
+    const {receiver: finalRoyaltyReceiver, royaltyAmount: finalRoyaltyAmount} = await this.canisNFT.royaltyInfo(0, 1000)
+    //THEN
+    expect(initialRoyaltyReceiver).to.be.equal(this.deployer)
+    expect(initialRoyaltyAmount).to.be.equal(0)
+    expect(updatedRoyaltyReceiver).to.be.equal(this.royaltyReceiver.address)
+    expect(updatedRoyaltyAmount).to.be.equal(1)
+    expect(finalRoyaltyReceiver).to.be.equal(initialRoyaltyReceiver)
+    expect(finalRoyaltyAmount).to.be.equal(initialRoyaltyAmount)
   })
 })
