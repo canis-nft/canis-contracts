@@ -7,13 +7,15 @@ module.exports = async (hardhat) => {
   const {deploy} = deployments
   const {deployer} = await getNamedAccounts()
 
-  const {cap, tokenUri, name, symbol} = {
+  const {cap, tokenUri, name, symbol, royaltyReceiver, feeNumerator} = {
     cap: !process.env.TOKEN_SUPPLY ? 3 : process.env.TOKEN_SUPPLY,
     tokenUri: !process.env.TOKEN_URI
       ? 'https://bafybeiahsj6so2jofeadwprofvphxo6g5d662xwzolztg6xgs3g4qa4vvi.ipfs.nftstorage.link/metadata/'
       : process.env.TOKEN_URI,
     name: !process.env.NFT_NAME ? 'CanisNFT' : process.env.NFT_NAME,
-    symbol: !process.env.NFT_SYMBOL ? 'CAN' : process.env.NFT_SYMBOL
+    symbol: !process.env.NFT_SYMBOL ? 'CAN' : process.env.NFT_SYMBOL,
+    royaltyReceiver: !process.env.ROYALTY_RECEIVER ? deployer : process.env.ROYALTY_RECEIVER,
+    feeNumerator: !process.env.FEE_NUMERATOR ? '0' : process.env.FEE_NUMERATOR
   }
 
   const chainId = parseInt(await getChainId(), 10)
@@ -29,7 +31,7 @@ module.exports = async (hardhat) => {
 
   cyan(`\nDeploying ${ContractName}...`)
   const CanisNFTResult = await deploy(ContractName, {
-    args: [cap, tokenUri, name, symbol],
+    args: [cap, tokenUri, name, symbol, royaltyReceiver, feeNumerator],
     contract: ContractName,
     from: deployer,
     skipIfAlreadyDeployed: false
