@@ -14,6 +14,8 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
 
     Counters.Counter private _tokenIdCounter;
 
+    string public contractUri;
+
     event Initialized(
         uint256 cap,
         string tokenUri,
@@ -25,6 +27,7 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
     event DefaultRoyaltyUpdated(address indexed royaltyReceiver, uint96 feeNumerator);
     event TokenRoyaltyUpdated(uint256 indexed tokenId, address indexed receiver, uint96 feeNumerator);
     event TokenRoyaltyReseted(uint256 indexed tokenId);
+    event ContractURIUpdated(string indexed contractUri);
 
     constructor(
         uint256 cap_,
@@ -106,5 +109,15 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
 
     function tokenURI(uint256 tokenId) public view override(ERC721URIStorage) returns (string memory) {
         return super.tokenURI(tokenId);
+    }
+
+    //openSea integration royalty. See https://docs.opensea.io/docs/contract-level-metadata
+    function contractURI() public view returns (string memory) {
+        return contractUri;
+    }
+
+    function setContractURI(string memory uri) public {
+        contractUri = uri;
+        emit ContractURIUpdated(contractUri);
     }
 }
