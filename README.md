@@ -83,7 +83,6 @@ The artifacts are available in the `deployments/` directory. For example, to pul
 const MyContract = require('./deployments/rinkeby/MyContract.json')
 const {abi, address, receipt} = MyContract
 ```
-
 ### Connect Locally
 
 Start up a [Hardhat Console](https://hardhat.dev/guides/hardhat-console.html):
@@ -133,10 +132,20 @@ yarn ipfs:images
 yarn ipfs:metadata
 ```
 
-## TODO
+## OpenSea Royalty integration
 
-- [ ] Item1
-- [ ] Item2
+For instance, check [here](https://ipfs.io/ipfs/QmbBXi3zGaFZ4S2cAea56cGhpD6eSRNL9b6BCUnrTpukT6)
+
+```json
+{
+  "name": "CanisNFT",
+  "description": "The collection is regarding canis collection",
+  "image": "ipfs://QmdBahHzFZLHR25hC4M2A8UifaApJReA49Hcg5dnfvG6MT",
+  "external_url": "http://www.canisnft.com",
+  "seller_fee_basis_points": 100, 
+  "fee_recipient": "0x8E0496C9786f8271Bc3712c9e5F794A137c2Dc87",
+  }
+```
 
 ## Contributing
 
