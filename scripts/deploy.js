@@ -1,10 +1,10 @@
-const {dim, cyan, chainName, green, displayResult} = require('../utils/utils')
+const { dim, cyan, chainName, green, displayResult } = require('../utils/utils')
 
 module.exports = async (hardhat) => {
-  const {getNamedAccounts, deployments, getChainId, ethers} = hardhat
-  const {deploy} = deployments
+  const { getNamedAccounts, deployments, getChainId, ethers } = hardhat
+  const { deploy } = deployments
 
-  let {deployer, admin} = await getNamedAccounts()
+  let { deployer, admin } = await getNamedAccounts()
 
   const chainId = parseInt(await getChainId(), 10)
 

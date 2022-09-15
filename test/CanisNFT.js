@@ -223,4 +223,21 @@ describe('Canis NFT', function () {
     expect(finalRoyaltyReceiver).to.be.equal(initialRoyaltyReceiver)
     expect(finalRoyaltyAmount).to.be.equal(initialRoyaltyAmount)
   })
+
+  it('Should not have a default value for contractUri', async () => {
+    //GIVEN
+    //WHEN
+    const value = await this.canisNFT.contractURI()
+    //THEN
+    expect(value.length).to.be.equal(0)
+  })
+
+  it('Should return setted value for contractUri', async () => {
+    //GIVEN
+    const contractUri = 'https://ipfs.io/ipfs/QmbBXi3zGaFZ4S2cAea56cGhpD6eSRNL9b6BCUnrTpukT6'
+    //WHEN //THEN
+    await expect(this.canisNFT.setContractURI(contractUri))
+      .to.emit(this.canisNFT, 'ContractURIUpdated')
+      .withArgs(contractUri)
+  })
 })
