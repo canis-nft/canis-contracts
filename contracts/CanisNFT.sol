@@ -9,12 +9,13 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
     uint256 public immutable CAP;
+    uint256 public startGiftingIndex;
+    uint256 public endGiftingIndex;
     string public baseTokenUri;
+    string public contractUri;
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIdCounter;
-
-    string public contractUri;
 
     event Initialized(
         uint256 cap,
@@ -68,6 +69,8 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
         emit DefaultRoyaltyUpdated(receiver, feeNumerator);
     }
 
+    function setGiftingIndexes(uint256 startIndex, uint256 endIndex) {}
+
     function setTokenRoyalty(
         uint256 tokenId,
         address receiver,
@@ -90,7 +93,7 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
         return super.supportsInterface(interfaceId);
     }
 
-    function safeMint() external returns (uint256) {
+    function safeMint() external onlyOwner returns (uint256) {
         require(balanceOf(msg.sender) == 0, "CANISNFT: OWNER CANNOT HAVE MORE THAN ONE NFT");
         uint256 tokenId = _tokenIdCounter.current();
         require(tokenId < CAP, "NFTCAPPED: cap exceeded");
@@ -101,6 +104,8 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
 
         return newTokenId;
     }
+
+    function claim() external {}
 
     // The following functions are overrides required by Solidity.
     function _burn(uint256 tokenId) internal override(ERC721URIStorage) {
