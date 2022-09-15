@@ -38,28 +38,28 @@ const config = {
       42: testnetAdmin,
       4: testnetAdmin,
       3: testnetAdmin,
-      43113: testnetAdmin,
+      43113: testnetAdmin
     },
     testnetUser1: {
       default: testnetUser1,
       3: testnetUser1,
       4: testnetUser1,
       42: testnetUser1,
-      43113: testnetUser1,
+      43113: testnetUser1
     },
     testnetUser2: {
       default: testnetUser2,
       3: testnetUser2,
       4: testnetUser2,
       42: testnetUser2,
-      43113: testnetUser2,
+      43113: testnetUser2
     },
     testnetUser3: {
       default: testnetUser3,
       3: testnetUser3,
       4: testnetUser3,
       42: testnetUser3,
-      43113: testnetUser3,
+      43113: testnetUser3
     },
     royaltyReceiver: {
       31337: '0x080D834838dc9EE7154a5d13E03073CA2ADd0C92'
