@@ -36,6 +36,6 @@ contract MockUniswapRouter is Ownable {
         uint256 deadline
     ) external payable returns (uint256[] memory amounts) {
         require(IERC20(UBIToken).balanceOf(address(this)) > 0, "NO MORE UBIS LEFT TO GIVE");
-        IERC20(UBIToken).transfer(msg.sender, amountOut * mulFactor);
+        IERC20(UBIToken).transfer(msg.sender, amountOut / mulFactor);
     }
 }
