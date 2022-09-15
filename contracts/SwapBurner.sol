@@ -59,17 +59,22 @@ contract SwapBurner is Ownable {
 
     /********** INTERFACE ***********/
 
-    function receiveSwapAndBurn(uint256 ubiAmount, uint256 deadline)
-        external
-        payable
-        returns (uint256[] memory amounts)
-    {
+    function getEstimatedUBIforETH(uint256 ethAmount) internal view returns (uint256[] memory) {
+        address[] memory path = new address[](2);
+        path[0] = IUniswapV2(Uniswap).WETH();
+        path[1] = UBI;
+
+        return IUniswapV2(Uniswap).getAmountsOut(ethAmount, path);
+    }
+
+    function receiveSwapAndBurn(uint256 deadline) external payable returns (uint256[] memory amounts) {
         address[] memory path = new address[](2);
         path[0] = IUniswapV2(Uniswap).WETH();
         path[1] = UBI;
 
         uint256 initialNativeBalance = address(this).balance;
         uint256 ubiInitialBalance = IUBI(UBI).balanceOf(address(this));
+        uint256 ubiAmount = (getEstimatedUBIforETH(msg.value))[0];
         amounts = IUniswapV2(Uniswap).swapETHForExactTokens{value: msg.value}(ubiAmount, path, address(this), deadline);
         uint256 ubiFinalBalace = IUBI(UBI).balanceOf(address(this));
 

@@ -59,14 +59,10 @@ const config = {
       3: testnetUser3,
       4: testnetUser3,
       42: testnetUser3,
-<<<<<<< HEAD
       43113: testnetUser3
-=======
-      43113: testnetUser3,
     },
     royaltyReceiver: {
       31337: '0x080D834838dc9EE7154a5d13E03073CA2ADd0C92'
->>>>>>> develop
     }
   },
   etherscan: {

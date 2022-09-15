@@ -34,7 +34,7 @@ describe('Swap Burner', function () {
     //THEN
     expect(expectedUniswapAddress).to.be.equal(uniswapRouter)
     expect(expectedUBIToken).to.be.equal(ubiToken)
-    expect(owner).to.be.equal(this.deployer)
+    expect(owner).to.be.equal(expectedOwner)
   })
 
   it('Should be able to approve UniswapRouter', async () => {
@@ -89,8 +89,8 @@ describe('Swap Burner', function () {
     const mockSwapFactor = await this.uniswapRouter.mulFactor()
     //WHEN
     const aliceInitialETHBalance = await ethers.provider.getBalance(this.alice.address)
-    await this.swapBurner.connect(this.alice).receiveSwapAndBurn(200, 30000, {
-      value: '100'
+    await this.swapBurner.connect(this.alice).receiveSwapAndBurn(30000, {
+      value: '200'
     })
     const finalAliceUBIBalance = await this.UBI.balanceOf(this.alice.address)
     const expectedFinalUBISupply = 1000000000000 - 200 / mockSwapFactor
@@ -113,11 +113,11 @@ describe('Swap Burner', function () {
     await this.UBI.transfer(this.uniswapRouter.address, '1000')
     //WHEN THEN
     await expect(
-      this.swapBurner.connect(this.alice).receiveSwapAndBurn(200, 30000, {
-        value: '100'
+      this.swapBurner.connect(this.alice).receiveSwapAndBurn(30000, {
+        value: '200'
       })
     )
       .to.emit(this.swapBurner, 'SwapAndBurn')
-      .withArgs(this.alice.address, 100, 100)
+      .withArgs(this.alice.address, 200, 100)
   })
 })

@@ -11,6 +11,9 @@ interface IUniswapV2 {
 
     function WETH() external pure returns (address);
 
+    // given an input amount of an asset and pair reserves, returns the maximum output amount of the other asset
+    function getAmountsOut(uint256 amountIn, address[] memory path) external view returns (uint256[] memory amounts);
+
     function swapTokensForExactTokens(
         uint256 amountOut,
         uint256 amountInMax,

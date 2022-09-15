@@ -29,6 +29,13 @@ contract MockUniswapRouter is Ownable {
         return WETHToken;
     }
 
+    // given an input amount of an asset and pair reserves, returns the maximum output amount of the other asset
+    function getAmountsOut(uint256 amountIn, address[] memory path) public returns (uint256[] memory amounts) {
+        amounts = new uint256[](path.length);
+        amounts[0] = amountIn;
+        amounts[1] = 0;
+    }
+
     function swapETHForExactTokens(
         uint256 amountOut,
         address[] calldata path,
