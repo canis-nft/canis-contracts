@@ -78,12 +78,12 @@ contract SwapBurner is Ownable {
         amounts = IUniswapV2(Uniswap).swapETHForExactTokens{value: msg.value}(ubiAmount, path, address(this), deadline);
         uint256 ubiFinalBalace = IUBI(UBI).balanceOf(address(this));
 
-        //Transfer Native dust
-        (bool sent, ) = payable(msg.sender).call{value: (msg.value) - (initialNativeBalance)}("");
-        require(sent, "Failed to send Native currency dust");
-
         require(ubiFinalBalace > ubiInitialBalance, "CanisSwap: SWAP FAILED");
         IUBI(UBI).burn(ubiFinalBalace - ubiInitialBalance);
+
+        //Transfer Native dust from swap
+        (bool sent, ) = payable(msg.sender).call{value: (msg.value) - (initialNativeBalance)}("");
+        require(sent, "Failed to send Native currency dust");
 
         emit SwapAndBurn(msg.sender, msg.value, ubiFinalBalace - ubiInitialBalance);
     }
