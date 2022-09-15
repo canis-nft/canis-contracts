@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "./interfaces/IUniswap.sol";
 import "./interfaces/IUBI.sol";
+import "hardhat/console.sol";
 
 contract SwapBurner is Ownable {
     /// @dev address of the uniswap router.
@@ -72,10 +73,9 @@ contract SwapBurner is Ownable {
         amounts = IUniswapV2(Uniswap).swapETHForExactTokens{value: msg.value}(ubiAmount, path, address(this), deadline);
         uint256 ubiFinalBalace = IUBI(UBI).balanceOf(address(this));
 
-        if (address(this).balance - initialNativeBalance > 0) {
-            (bool sent, ) = payable(msg.sender).call{value: (msg.value) - (initialNativeBalance)}("");
-            require(sent, "Failed to send Native currency dust");
-        }
+        //Transfer Native dust
+        (bool sent, ) = payable(msg.sender).call{value: (msg.value) - (initialNativeBalance)}("");
+        require(sent, "Failed to send Native currency dust");
 
         require(ubiFinalBalace > ubiInitialBalance, "CanisSwap: SWAP FAILED");
         IUBI(UBI).burn(ubiFinalBalace - ubiInitialBalance);
