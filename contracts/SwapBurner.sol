@@ -12,10 +12,12 @@ contract SwapBurner is Ownable {
     address public Uniswap;
     /// @dev address of the UBI token.
     address public immutable UBI;
+    uint256 public swapDeadline;
 
-    event Initialized(address indexed uniswapRouter, address indexed ubiToken);
+    event Initialized(address indexed uniswapRouter, address indexed ubiToken, uint256 swapDeadline);
     event UniswapApproved(uint256 amount);
     event UniswapAllowanceUpdated(uint256 oldAmount, uint256 newAmount);
+    event SwapDeadLineUpdated(uint256 oldDeadline, uint256 newDeadline);
     event SwapAndBurn(address indexed sender, uint256 nativeAmount, uint256 UBIBurnedAmount);
 
     /**
@@ -28,13 +30,18 @@ contract SwapBurner is Ownable {
         _;
     }
 
-    constructor(address _uniswapRouter, address _ubiToken)
+    constructor(
+        address _uniswapRouter,
+        address _ubiToken,
+        uint256 _swapDeadline
+    )
         isValidAddress(_uniswapRouter, "Uniswap address can not be null")
         isValidAddress(_ubiToken, "UBI address can not be null")
     {
         Uniswap = _uniswapRouter;
         UBI = _ubiToken;
-        emit Initialized(Uniswap, UBI);
+        swapDeadline = _swapDeadline;
+        emit Initialized(Uniswap, UBI, swapDeadline);
     }
 
     /********** GETTERS ***********/
@@ -57,6 +64,12 @@ contract SwapBurner is Ownable {
         emit UniswapAllowanceUpdated(oldAllowance, amount);
     }
 
+    function setSwapDeadline(uint256 newDeadline) external onlyOwner {
+        uint256 oldDeadline = swapDeadline;
+        swapDeadline = newDeadline;
+        emit SwapDeadLineUpdated(oldDeadline, newDeadline);
+    }
+
     /********** INTERFACE ***********/
 
     function getEstimatedUBIforETH(uint256 ethAmount) internal view returns (uint256[] memory) {
@@ -67,7 +80,7 @@ contract SwapBurner is Ownable {
         return IUniswapV2(Uniswap).getAmountsOut(ethAmount, path);
     }
 
-    function receiveSwapAndBurn(uint256 deadline) external payable returns (uint256[] memory amounts) {
+    function receiveSwapAndBurn() external payable returns (uint256[] memory amounts) {
         address[] memory path = new address[](2);
         path[0] = IUniswapV2(Uniswap).WETH();
         path[1] = UBI;
@@ -75,7 +88,12 @@ contract SwapBurner is Ownable {
         uint256 initialNativeBalance = address(this).balance;
         uint256 ubiInitialBalance = IUBI(UBI).balanceOf(address(this));
         uint256 ubiAmount = (getEstimatedUBIforETH(msg.value))[0];
-        amounts = IUniswapV2(Uniswap).swapETHForExactTokens{value: msg.value}(ubiAmount, path, address(this), deadline);
+        amounts = IUniswapV2(Uniswap).swapETHForExactTokens{value: msg.value}(
+            ubiAmount,
+            path,
+            address(this),
+            swapDeadline
+        );
         uint256 ubiFinalBalace = IUBI(UBI).balanceOf(address(this));
 
         require(ubiFinalBalace > ubiInitialBalance, "CanisSwap: SWAP FAILED");
