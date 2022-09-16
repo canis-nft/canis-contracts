@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
-const { expect } = require('chai')
-const { ethers, deployments, getNamedAccounts } = require('hardhat')
+const {expect} = require('chai')
+const {ethers, deployments, getNamedAccounts} = require('hardhat')
 
 /**
  * By default, ContractFactory and Contract instances are connected to the first signer.
@@ -8,7 +8,7 @@ const { ethers, deployments, getNamedAccounts } = require('hardhat')
 describe('Canis NFT', function () {
   before(async () => {
     const signers = await ethers.getSigners()
-    const { deployer } = await getNamedAccounts()
+    const {deployer} = await getNamedAccounts()
     this.deployer = deployer
     this.owner = signers[0]
     this.alice = signers[1]
@@ -150,7 +150,7 @@ describe('Canis NFT', function () {
     //GIVEN //WHEN
     const tokenId = 0
     const salePrice = 1000
-    const { receiver, royaltyAmount } = await this.canisNFT.royaltyInfo(tokenId, salePrice)
+    const {receiver, royaltyAmount} = await this.canisNFT.royaltyInfo(tokenId, salePrice)
     //THEN
     expect(receiver).to.be.equal(this.deployer)
     expect(royaltyAmount).to.be.equal(0)
@@ -164,7 +164,7 @@ describe('Canis NFT', function () {
     //WHEN
     const tokenId = 0
     const salePrice = 1000
-    const { receiver, royaltyAmount } = await this.canisNFT.royaltyInfo(tokenId, salePrice)
+    const {receiver, royaltyAmount} = await this.canisNFT.royaltyInfo(tokenId, salePrice)
     //THEN
     expect(receiver).to.be.equal(expectedRoyaltyReceiver)
     expect(royaltyAmount).to.be.equal('1')
@@ -175,7 +175,7 @@ describe('Canis NFT', function () {
     await this.canisNFT.connect(this.alice).safeMint()
     const salePrice = 10
     //WHEN
-    const { receiver, royaltyAmount } = await this.canisNFT.royaltyInfo(0, salePrice)
+    const {receiver, royaltyAmount} = await this.canisNFT.royaltyInfo(0, salePrice)
     //THEN
     expect(receiver).to.be.equal(this.deployer)
     expect(royaltyAmount).to.be.equal('0')
@@ -188,12 +188,12 @@ describe('Canis NFT', function () {
     const customFeeNumerator = 10
     const salePrice = 1000
     //WHEN
-    const { receiver: defaultReceiver, royaltyAmount: defaultRoyaltyAmount } = await this.canisNFT.royaltyInfo(
+    const {receiver: defaultReceiver, royaltyAmount: defaultRoyaltyAmount} = await this.canisNFT.royaltyInfo(
       1,
       salePrice
     )
     await this.canisNFT.setTokenRoyalty(0, customRoyaltyReceiver, customFeeNumerator)
-    const { receiver: customReceiver, royaltyAmount: customRoyalty } = await this.canisNFT.royaltyInfo(0, salePrice)
+    const {receiver: customReceiver, royaltyAmount: customRoyalty} = await this.canisNFT.royaltyInfo(0, salePrice)
     //THEN
     expect(defaultReceiver).to.be.equal(defaultRoyaltyReceiver)
     expect(defaultRoyaltyAmount).to.be.equal(0)
@@ -203,18 +203,18 @@ describe('Canis NFT', function () {
 
   it('Should be able to reset token royalty for a token', async () => {
     //GIVEN
-    const { receiver: initialRoyaltyReceiver, royaltyAmount: initialRoyaltyAmount } = await this.canisNFT.royaltyInfo(
+    const {receiver: initialRoyaltyReceiver, royaltyAmount: initialRoyaltyAmount} = await this.canisNFT.royaltyInfo(
       0,
       10
     )
     await this.canisNFT.setTokenRoyalty(0, this.royaltyReceiver.address, '10')
-    const { receiver: updatedRoyaltyReceiver, royaltyAmount: updatedRoyaltyAmount } = await this.canisNFT.royaltyInfo(
+    const {receiver: updatedRoyaltyReceiver, royaltyAmount: updatedRoyaltyAmount} = await this.canisNFT.royaltyInfo(
       0,
       1000
     )
     //WHEN
     await this.canisNFT.resetTokenRoyalty(0)
-    const { receiver: finalRoyaltyReceiver, royaltyAmount: finalRoyaltyAmount } = await this.canisNFT.royaltyInfo(0, 1000)
+    const {receiver: finalRoyaltyReceiver, royaltyAmount: finalRoyaltyAmount} = await this.canisNFT.royaltyInfo(0, 1000)
     //THEN
     expect(initialRoyaltyReceiver).to.be.equal(this.deployer)
     expect(initialRoyaltyAmount).to.be.equal(0)
@@ -227,14 +227,14 @@ describe('Canis NFT', function () {
   it('Should not have a default value for contractUri', async () => {
     //GIVEN
     //WHEN
-    const value = await this.canisNFT.contractURI();
+    const value = await this.canisNFT.contractURI()
     //THEN
     expect(value.length).to.be.equal(0)
   })
 
   it('Should return setted value for contractUri', async () => {
     //GIVEN
-    const contractUri = "https://ipfs.io/ipfs/QmbBXi3zGaFZ4S2cAea56cGhpD6eSRNL9b6BCUnrTpukT6";
+    const contractUri = 'https://ipfs.io/ipfs/QmbBXi3zGaFZ4S2cAea56cGhpD6eSRNL9b6BCUnrTpukT6'
     //WHEN //THEN
     await expect(this.canisNFT.setContractURI(contractUri))
       .to.emit(this.canisNFT, 'ContractURIUpdated')
