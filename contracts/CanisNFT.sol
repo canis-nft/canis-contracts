@@ -126,6 +126,7 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
     }
 
     function giftNFT(address to) external onlyOwner returns (uint256) {
+        require(balanceOf(to) == 0, "CANISNFT: AWARDED ADDRESS CANNOT HAVE MORE THAN ONE NFT");
         uint256 tokenId = _tokenIdCounter.current();
         require(tokenId < CAP, "NFTCAPPED: cap exceeded");
         _tokenIdCounter.increment();
@@ -144,7 +145,7 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
         require(tokenId < CAP, "NFTCAPPED: no more NFTs left to claim");
         _tokenIdClaimedCounter.increment();
         uint256 newTokenId = _tokenIdClaimedCounter.current();
-        if (this.ownerOf(newTokenId) == address(this)) {
+        if (this.ownerOf(newTokenId) != address(this)) {
             _tokenIdClaimedCounter.increment();
             return false;
         } else {
