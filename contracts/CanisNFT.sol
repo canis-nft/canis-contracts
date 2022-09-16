@@ -16,6 +16,7 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIdCounter;
+    Counters.Counter private _tokenIdClaimedCounter;
 
     event Initialized(
         uint256 cap,
@@ -23,12 +24,16 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
         string name,
         string symbol,
         address defaultRoyaltyReceiver,
-        uint96 defaultFeeNumerator
+        uint96 defaultFeeNumerator,
+        uint256 startGiftingIndex,
+        uint256 endGiftingIndex
     );
     event DefaultRoyaltyUpdated(address indexed royaltyReceiver, uint96 feeNumerator);
     event TokenRoyaltyUpdated(uint256 indexed tokenId, address indexed receiver, uint96 feeNumerator);
     event TokenRoyaltyReseted(uint256 indexed tokenId);
     event ContractURIUpdated(string indexed contractUri);
+    event GiftingIndexesUpdated(uint256 startGiftingIndex, uint256 endGiftingIndex);
+    event Claim(address indexed to, uint256 tokenId);
 
     constructor(
         uint256 cap_,
@@ -36,13 +41,26 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
         string memory name,
         string memory symbol,
         address defaultRoyaltyReceiver,
-        uint96 defaultFeeNumerator
+        uint96 defaultFeeNumerator,
+        uint256 _startGiftingIndex,
+        uint256 _endGiftingIndex
     ) ERC721(name, symbol) {
         require(cap_ > 0, "NFTCapped: cap is 0");
         CAP = cap_;
         baseTokenUri = _baseTokenUri;
+        startGiftingIndex = _startGiftingIndex;
+        endGiftingIndex = _endGiftingIndex;
         super._setDefaultRoyalty(defaultRoyaltyReceiver, defaultFeeNumerator);
-        emit Initialized(CAP, baseTokenUri, name, symbol, defaultRoyaltyReceiver, defaultFeeNumerator);
+        emit Initialized(
+            CAP,
+            baseTokenUri,
+            name,
+            symbol,
+            defaultRoyaltyReceiver,
+            defaultFeeNumerator,
+            startGiftingIndex,
+            endGiftingIndex
+        );
     }
 
     /********** GETTERS ***********/
@@ -69,7 +87,11 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
         emit DefaultRoyaltyUpdated(receiver, feeNumerator);
     }
 
-    function setGiftingIndexes(uint256 startIndex, uint256 endIndex) {}
+    function setGiftingIndexes(uint256 startIndex, uint256 endIndex) external onlyOwner {
+        startGiftingIndex = startIndex;
+        endGiftingIndex = endIndex;
+        emit GiftingIndexesUpdated(startIndex, endIndex);
+    }
 
     function setTokenRoyalty(
         uint256 tokenId,
@@ -94,18 +116,43 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
     }
 
     function safeMint() external onlyOwner returns (uint256) {
-        require(balanceOf(msg.sender) == 0, "CANISNFT: OWNER CANNOT HAVE MORE THAN ONE NFT");
         uint256 tokenId = _tokenIdCounter.current();
         require(tokenId < CAP, "NFTCAPPED: cap exceeded");
-
         _tokenIdCounter.increment();
         uint256 newTokenId = _tokenIdCounter.current();
-        _safeMint(msg.sender, newTokenId);
-
+        require(newTokenId < startGiftingIndex && newTokenId > endGiftingIndex, "CANISNFT: CANNOT MINT GIFTABLE NFT");
+        _safeMint(this.owner(), newTokenId);
         return newTokenId;
     }
 
-    function claim() external {}
+    function giftNFT(address to) external onlyOwner returns (uint256) {
+        uint256 tokenId = _tokenIdCounter.current();
+        require(tokenId < CAP, "NFTCAPPED: cap exceeded");
+        _tokenIdCounter.increment();
+        uint256 newTokenId = _tokenIdCounter.current();
+        require(
+            newTokenId >= startGiftingIndex && newTokenId <= endGiftingIndex,
+            "CANISNFT: CANNOT MINT NON GIFTABLE NFT"
+        );
+        _safeMint(to, newTokenId);
+        return newTokenId;
+    }
+
+    function claim() external returns (bool) {
+        require(balanceOf(msg.sender) == 0, "CANISNFT: OWNER CANNOT HAVE MORE THAN ONE NFT");
+        uint256 tokenId = _tokenIdClaimedCounter.current();
+        require(tokenId < CAP, "NFTCAPPED: no more NFTs left to claim");
+        _tokenIdClaimedCounter.increment();
+        uint256 newTokenId = _tokenIdClaimedCounter.current();
+        if (this.ownerOf(newTokenId) == address(this)) {
+            _tokenIdClaimedCounter.increment();
+            return false;
+        } else {
+            this.safeTransferFrom(address(this), msg.sender, newTokenId);
+            emit Claim(msg.sender, newTokenId);
+            return true;
+        }
+    }
 
     // The following functions are overrides required by Solidity.
     function _burn(uint256 tokenId) internal override(ERC721URIStorage) {
