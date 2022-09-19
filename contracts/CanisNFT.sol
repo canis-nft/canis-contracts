@@ -180,9 +180,4 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
             super._setTokenURI(startTokenId + i, tokenURIs[i]);
         }
     }
-
-    /*
-    setTokenURI
-    setTokenURI (batch)
-*/
 }
