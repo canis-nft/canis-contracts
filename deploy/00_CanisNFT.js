@@ -12,7 +12,6 @@ module.exports = async (hardhat) => {
 
   const {
     cap,
-    baseTokenUri,
     name,
     symbol,
     defaultRoyaltyReceiver,
@@ -32,7 +31,7 @@ module.exports = async (hardhat) => {
 
   cyan(`\nDeploying ${contractName}...`)
   const CanisNFTResult = await deploy(contractName, {
-    args: [cap, baseTokenUri, name, symbol, defaultRoyaltyReceiver, defaultFeeNumerator, startGiftingIndex, endGiftingIndex, contractUri],
+    args: [cap, name, symbol, defaultRoyaltyReceiver, defaultFeeNumerator, startGiftingIndex, endGiftingIndex, contractUri],
     contract: contractName,
     from: deployer,
     skipIfAlreadyDeployed: false

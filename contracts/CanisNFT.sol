@@ -11,7 +11,6 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
     uint256 public immutable CAP;
     uint256 public startGiftingIndex;
     uint256 public endGiftingIndex;
-    string public baseTokenUri;
     string public contractUri;
     using Counters for Counters.Counter;
 
@@ -19,7 +18,6 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
 
     event Initialized(
         uint256 cap,
-        string tokenUri,
         string name,
         string symbol,
         address defaultRoyaltyReceiver,
@@ -37,7 +35,6 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
 
     constructor(
         uint256 cap_,
-        string memory _baseTokenUri,
         string memory name,
         string memory symbol,
         address defaultRoyaltyReceiver,
@@ -48,14 +45,12 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
     ) ERC721(name, symbol) {
         require(cap_ > 0, "NFTCapped: cap is 0");
         CAP = cap_;
-        baseTokenUri = _baseTokenUri;
         startGiftingIndex = _startGiftingIndex;
         endGiftingIndex = _endGiftingIndex;
         contractUri = _contractUri;
         super._setDefaultRoyalty(defaultRoyaltyReceiver, defaultFeeNumerator);
         emit Initialized(
             CAP,
-            baseTokenUri,
             name,
             symbol,
             defaultRoyaltyReceiver,
@@ -68,9 +63,9 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
 
     /********** GETTERS ***********/
 
-    function _baseURI() internal view override returns (string memory) {
+    /*function _baseURI() internal view override returns (string memory) {
         return baseTokenUri;
-    }
+    }*/
 
     /// @inheritdoc	IERC2981
     function royaltyInfo(uint256 tokenId, uint256 salePrice)
@@ -123,7 +118,7 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
         return super.supportsInterface(interfaceId);
     }
 
-    function safeMint() external onlyOwner returns (uint256) {
+    function safeMint() public onlyOwner returns (uint256) {
         _tokenIdCounter.increment();
         uint256 newTokenId = _tokenIdCounter.current();
         require(newTokenId <= CAP, "NFTCAPPED: cap exceeded");
@@ -167,4 +162,27 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
     function contractURI() public view returns (string memory) {
         return contractUri;
     }
+
+    function setTokenURI(uint256 tokenId, string memory _tokenURI) external onlyOwner {
+        super._setTokenURI(tokenId, _tokenURI);
+    }
+
+    function safeMintBatch(uint256 quantity) external onlyOwner returns (uint256) {
+        for (uint256 i = 0; i < quantity; i++) {
+            safeMint();
+        }
+        return _tokenIdCounter.current();
+    }
+
+    function setTokenURIBatch(uint256 startTokenId, string[] memory tokenURIs) external onlyOwner {
+        require(tokenURIs.length < 500, "CANISNFT: BATCH SIZE EXCEEDED");
+        for (uint256 i = 0; i < tokenURIs.length; i++) {
+            super._setTokenURI(startTokenId + i, tokenURIs[i]);
+        }
+    }
+
+    /*
+    setTokenURI
+    setTokenURI (batch)
+*/
 }

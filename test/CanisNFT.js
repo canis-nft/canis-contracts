@@ -27,35 +27,35 @@ describe('Canis NFT', function () {
   })
 
   it('Should have initialized correctly', async () => {
-
     //GIVEN
     const expectedName = this.config.name
     const expectedSymbol = this.config.symbol
     const expectedCap = this.config.cap
-    const expectedBaseTokenUri = this.config.baseTokenUri
     const expectedDefaultRoyaltyReceiver = this.config.defaultRoyaltyReceiver
     const expectedDefaultFeeNumerator = this.config.defaultFeeNumerator
     const expectedStartGiftingIndex = this.config.startGiftingIndex
     const expectedEndGiftingIndex = this.config.endGiftingIndex
     const expectedContractUri = this.config.contractUri
     const expectedOwner = this.deployer
+
+    const salePrice = 1000
+    const expectedRoyaltyAmount = salePrice * (expectedDefaultFeeNumerator / 10000)
+
     //WHEN
     const name = await this.canisNFT.name()
     const symbol = await this.canisNFT.symbol()
     const cap = await this.canisNFT.CAP()
-    const baseTokenUri = await this.canisNFT.baseTokenUri()
-    const { receiver } = await this.canisNFT.royaltyInfo(1, 1000)
+    const { receiver, royaltyAmount } = await this.canisNFT.royaltyInfo(1, 1000)
     const startGiftingIndex = await this.canisNFT.startGiftingIndex()
     const endGiftingIndex = await this.canisNFT.endGiftingIndex()
     const contractUri = await this.canisNFT.contractURI()
     const owner = await this.canisNFT.owner()
-
     //THEN
     expect(name).to.be.equal(expectedName)
     expect(symbol).to.be.equal(expectedSymbol)
     expect(cap).to.be.equal(expectedCap)
-    expect(baseTokenUri).to.be.equal(expectedBaseTokenUri)
     expect(receiver).to.be.equal(expectedDefaultRoyaltyReceiver)
+    expect(royaltyAmount).to.be.equal(expectedRoyaltyAmount)
     expect(startGiftingIndex).to.be.equal(expectedStartGiftingIndex)
     expect(endGiftingIndex).to.be.equal(expectedEndGiftingIndex)
     expect(contractUri).to.be.equal(expectedContractUri)
@@ -67,7 +67,6 @@ describe('Canis NFT', function () {
     const name = this.config.name
     const symbol = this.config.symbol
     const cap = 0
-    const baseTokenUri = this.config.baseTokenUri
     const defaultRoyaltyReceiver = this.config.defaultRoyaltyReceiver
     const defaultFeeNumerator = this.config.defaultFeeNumerator
     const startGiftingIndex = this.config.startGiftingIndex
@@ -76,7 +75,7 @@ describe('Canis NFT', function () {
     const expectedOwner = this.deployer
     //WHEN //THEN
 
-    await expect(this.CanisNFT.deploy(cap, baseTokenUri, name, symbol, defaultRoyaltyReceiver, defaultFeeNumerator, startGiftingIndex, endGiftingIndex, contractUri)).to.be.revertedWith(
+    await expect(this.CanisNFT.deploy(cap, name, symbol, defaultRoyaltyReceiver, defaultFeeNumerator, startGiftingIndex, endGiftingIndex, contractUri)).to.be.revertedWith(
       'NFTCapped: cap is 0'
     )
   })
@@ -233,9 +232,77 @@ describe('Canis NFT', function () {
 
   it('Should have a default value for contractUri', async () => {
     //GIVEN
+    const expectedContractUri = this.config.contractUri;
     //WHEN
     const value = await this.canisNFT.contractURI()
     //THEN
-    expect(value).to.be.equal(this.config.contractUri)
+    expect(value).to.be.equal(expectedContractUri)
   })
+
+  it('Should be able to set token uri owner', async () => {
+    //GIVEN
+    const tokenOneUri = "ipfs://hash1"
+    const tokenTwoUri = "ipfs://hash2"
+    await this.canisNFT.safeMint()
+    await this.canisNFT.safeMint()
+    //WHEN
+    await this.canisNFT.setTokenURI(1, tokenOneUri)
+    await this.canisNFT.setTokenURI(2, tokenTwoUri)
+    //THEN
+    expect(tokenOneUri).to.be.equal(await this.canisNFT.tokenURI(1))
+    expect(tokenTwoUri).to.be.equal(await this.canisNFT.tokenURI(2))
+  })
+
+  it('Should not be able to set token uri no-owner', async () => {
+    //GIVEN
+    const tokenOneUri = "ipfs://hash1"
+    await this.canisNFT.safeMint()
+    //WHEN //THEN
+    await expect(this.canisNFT.connect(this.alice).setTokenURI(1, tokenOneUri)).to.be.revertedWith('Ownable: caller is not the owner')
+  })
+
+  it('Should be able to mint batch tokens owner', async () => {
+    //GIVEN
+    const cap = this.config.cap
+    //WHEN
+    await this.canisNFT.safeMintBatch(cap)
+    const balance = await this.canisNFT.balanceOf(this.deployer)
+    //THEN
+    expect(balance).to.be.equal(cap)
+    await expect(this.canisNFT.safeMint()).to.be.revertedWith('NFTCAPPED: cap exceeded')
+  })
+
+  it('Should not be able to mint batch tokens no-owner', async () => {
+    //GIVEN //WHEN //THEN
+    await expect(this.canisNFT.connect(this.alice).safeMintBatch(5)).to.be.revertedWith('Ownable: caller is not the owner')
+  })
+
+  it('Should be able to set token uri batch owner', async () => {
+    //GIVEN
+    const tokenUris = ["ipfs://hash1", "ipfs://hash2"]
+    await this.canisNFT.safeMint()
+    await this.canisNFT.safeMint()
+    //WHEN
+    const actualTokenUri1 = await this.canisNFT.tokenURI(1)
+    const actualTokenUri2 = await this.canisNFT.tokenURI(2)
+    await this.canisNFT.setTokenURIBatch(1, tokenUris)
+    //THEN
+    expect(actualTokenUri1.length).to.be.equal(0)
+    expect(actualTokenUri2.length).to.be.equal(0)
+    expect(tokenUris[0]).to.be.equal(await this.canisNFT.tokenURI(1))
+    expect(tokenUris[1]).to.be.equal(await this.canisNFT.tokenURI(2))
+  })
+
+  it('Should not be able to set token uri batch no-owner', async () => {
+
+  })
+
+
+  /*
+  function setTokenURIBatch(uint256 startTokenId, string[] memory tokenURIs) external onlyOwner {
+    require(tokenURIs.length < 500, "CANISNFT: BATCH SIZE EXCEEDED");
+    for (uint256 i = 0; i < tokenURIs.length; i++) {
+      super._setTokenURI(startTokenId + i, tokenURIs[i]);
+    }
+  } */
 })
