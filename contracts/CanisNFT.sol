@@ -18,7 +18,7 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
     Counters.Counter private _tokenIdCounter;
 
     event Initialized(
-        uint256 indexedcap,
+        uint256 cap,
         string tokenUri,
         string name,
         string symbol,
