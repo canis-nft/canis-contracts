@@ -60,6 +60,8 @@ if (process.env.HDWALLET_MNEMONIC || process.env.PRIVATE_KEY) {
   };
 }
 
+//https://red-distinguished-asphalt.avalanche-testnet.discover.quiknode.pro/6e0eb89903db60e2245d123a6d91ed63202041a3/
+//url: 'https://api.avax-test.network/ext/bc/C/rpc',
 //blockGasLimit: 100000,
 
 if (process.env.POLYGONSCAN_API_KEY && (process.env.HDWALLET_MNEMONIC || process.env.PRIVATE_KEY)) {
@@ -77,7 +79,10 @@ if (process.env.INFURA_API_KEY && (process.env.HDWALLET_MNEMONIC || process.env.
   networks.goerli = {
     url: `https://goerli.infura.io/v3/${process.env.INFURA_API_KEY}`,
     accounts,
-    blockGasLimit: 100000,
+    gas: 2100000,
+    gasPrice: 50000000000,
+    maxPriorityFeePerGas: 2000000000,
+    maxFeePerGas: 51500000000
   }
 
   networks.mainnet = {
