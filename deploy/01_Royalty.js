@@ -1,13 +1,17 @@
 const { dim, green, cyan, chainName, displayResult, yellow } = require('../utils/utils')
+const config = require('../config')
 const version = 'v0.1.0'
 const contractName = 'Royalty'
 
 module.exports = async (hardhat) => {
   const { getNamedAccounts, deployments, getChainId } = hardhat
   const { deploy } = deployments
-  const { admin, deployer, royaltyReceiver } = await getNamedAccounts()
+  const { admin, deployer } = await getNamedAccounts()
 
   const chainId = parseInt(await getChainId(), 10)
+  const {
+    royaltyReceiver
+  } = config[contractName][chainId]
 
   const isTestEnvironment = chainId === 31337 || chainId === 1337
 

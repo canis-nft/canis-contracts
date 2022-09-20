@@ -38,8 +38,12 @@ const chainName = (chainId) => {
       return 'Ropsten'
     case 4:
       return 'Rinkeby'
+    case 5:
+      return 'Goerli'
     case 42:
       return 'Kovan'
+    case 43113:
+      return 'Fuji'
     case 31337:
       return 'HardhatEVM'
     case 80001:

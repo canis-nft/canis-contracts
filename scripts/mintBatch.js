@@ -12,7 +12,7 @@ async function main() {
   canisNFT = await ethers.getContract('CanisNFT', deployer)
 
   dim('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-  dim(` CanisNFT Contracts - Mint Posters `)
+  dim(` CanisNFT Contracts - Mint Batch Posters `)
   dim('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n')
   /*
     const feeData = await ethers.provider.getFeeData();
@@ -43,15 +43,18 @@ async function main() {
   await canisNFT.safeMintBatch(endGiftingIndex.toNumber())
 
   yellow(`\setTokenURI from tokenId 1 to ${endGiftingIndex.toNumber()}`)
+  let tokenUris = []
+
   for (let i = 1; i <= endGiftingIndex.toNumber(); i = i + 3) {
-    await canisNFT.setTokenURI(i, posters["poster-en"].ipfs)
-    await canisNFT.setTokenURI(i + 1, posters["poster-es"].ipfs)
-    await canisNFT.setTokenURI(i + 2, posters["poster-pt"].ipfs)
-    cyan(`tokenId ${i}, ${i + 1}, ${i + 2} tokenURI setted`)
+    tokenUris.push(posters["poster-en"].ipfs)
+    tokenUris.push(posters["poster-es"].ipfs)
+    tokenUris.push(posters["poster-pt"].ipfs)
   }
 
+  await canisNFT.setTokenURIBatch(1, tokenUris)
+
   dim('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-  green('CanisNFT Contracts - Mint Posters Complete!')
+  green('CanisNFT Contracts - Mint Batch Posters Complete!')
   dim('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n')
 }
 

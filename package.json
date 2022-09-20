@@ -21,7 +21,7 @@
     "echidna:build": "docker build -t canis/echidna . -f Dockerfile.echidna",
     "echidna": "yarn echidna:build && docker run -it --rm -v \"$PWD\":/src canis/echidna",
     "size-contracts": "hardhat size-contracts",
-    "deploy:node": "hardhat --config hardhat.config.js deploy --deploy-scripts scripts --write true --network",
+    "deploy:node": "hardhat --config hardhat.config.js deploy --deploy-scripts deploy --write true --network",
     "deploy": "npx hardhat deploy",
     "docgen": "hardhat docgen",
     "ipfs:images": "npx ipfs-car --pack images --output images.car",
