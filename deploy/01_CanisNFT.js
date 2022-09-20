@@ -10,11 +10,12 @@ module.exports = async (hardhat) => {
 
   const chainId = parseInt(await getChainId(), 10)
 
+  defaultRoyaltyReceiver = (await ethers.getContract('Royalty', this.deployer)).address
+
   const {
     cap,
     name,
     symbol,
-    defaultRoyaltyReceiver,
     defaultFeeNumerator,
     startGiftingIndex,
     endGiftingIndex,

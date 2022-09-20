@@ -15,6 +15,7 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIdCounter;
+    uint256 private tokenIdGiftedIndex;
 
     event Initialized(
         uint256 cap,
@@ -32,6 +33,7 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
     event GiftingIndexesUpdated(uint256 startGiftingIndex, uint256 endGiftingIndex);
     event Gifted(address indexed to, uint256 tokenId);
     event Claimed(address indexed to, uint256 tokenId);
+    event ContractURIUpdated(string indexed contractUri);
 
     constructor(
         uint256 cap_,
@@ -47,6 +49,7 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
         CAP = cap_;
         startGiftingIndex = _startGiftingIndex;
         endGiftingIndex = _endGiftingIndex;
+        tokenIdGiftedIndex = startGiftingIndex;
         contractUri = _contractUri;
         super._setDefaultRoyalty(defaultRoyaltyReceiver, defaultFeeNumerator);
         emit Initialized(
@@ -62,10 +65,6 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
     }
 
     /********** GETTERS ***********/
-
-    /*function _baseURI() internal view override returns (string memory) {
-        return baseTokenUri;
-    }*/
 
     /// @inheritdoc	IERC2981
     function royaltyInfo(uint256 tokenId, uint256 salePrice)
@@ -93,6 +92,7 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
         );
         startGiftingIndex = startIndex;
         endGiftingIndex = endIndex;
+        tokenIdGiftedIndex = startGiftingIndex;
         emit GiftingIndexesUpdated(startIndex, endIndex);
     }
 
@@ -127,15 +127,16 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
     }
 
     function _gift(address to) internal returns (uint256) {
-        _tokenIdCounter.increment();
-        uint256 newTokenId = _tokenIdCounter.current();
-        require(newTokenId <= CAP, "NFTCAPPED: cap exceeded");
+        require(tokenIdGiftedIndex <= CAP, "NFTCAPPED: cap exceeded");
         require(
-            newTokenId >= startGiftingIndex && newTokenId <= endGiftingIndex,
+            tokenIdGiftedIndex >= startGiftingIndex && tokenIdGiftedIndex <= endGiftingIndex,
             "CANISNFT: CANNOT MINT NON GIFTABLE NFT"
         );
-        _safeMint(to, newTokenId);
-        return newTokenId;
+        super._approve(to, tokenIdGiftedIndex);
+        super.safeTransferFrom(this.owner(), to, tokenIdGiftedIndex);
+        uint256 tokenId = tokenIdGiftedIndex;
+        tokenIdGiftedIndex += 1;
+        return tokenId;
     }
 
     function gift(address to) external onlyOwner {
@@ -181,8 +182,8 @@ contract CanisNFT is ERC721URIStorage, ERC2981, Ownable {
         }
     }
 
-    /*
-    setTokenURI
-    setTokenURI (batch)
-*/
+    function setContractURI(string memory _contractUri) external onlyOwner {
+        contractUri = _contractUri;
+        emit ContractURIUpdated(contractUri);
+    }
 }

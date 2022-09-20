@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 const { expect } = require('chai')
-const { ethers, deployments, getNamedAccounts } = require('hardhat')
+const { ethers, deployments, getNamedAccounts, getChainId } = require('hardhat')
+const config = require('../config')
 
 /**
  * By default, ContractFactory and Contract instances are connected to the first signer.
@@ -19,7 +20,9 @@ describe('Royalty', function () {
     const signers = await ethers.getSigners()
     const { deployer, royaltyReceiver } = await getNamedAccounts()
     this.deployer = deployer
-    this.royaltyReceiver = royaltyReceiver
+    const chainId = parseInt(await getChainId(), 10)
+    this.config = config['Royalty'][chainId]
+    this.royaltyReceiver = this.config.royaltyReceiver
     this.Royalty = await ethers.getContractFactory('Royalty')
   })
 
