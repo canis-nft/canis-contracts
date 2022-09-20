@@ -43,11 +43,12 @@ async function main() {
   await canisNFT.safeMintBatch(endGiftingIndex.toNumber())
 
   yellow(`\setTokenURI from tokenId 1 to ${endGiftingIndex.toNumber()}`)
-  for (let i = 1; i <= endGiftingIndex.toNumber(); i = i + 3) {
+  for (let i = 4; i <= endGiftingIndex.toNumber(); i = i + 3) {
     await canisNFT.setTokenURI(i, posters["poster-en"].ipfs)
     await canisNFT.setTokenURI(i + 1, posters["poster-es"].ipfs)
     await canisNFT.setTokenURI(i + 2, posters["poster-pt"].ipfs)
     cyan(`tokenId ${i}, ${i + 1}, ${i + 2} tokenURI setted`)
+    await new Promise(r => setTimeout(r, 30000));
   }
 
   dim('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
