@@ -1,6 +1,7 @@
 const chalk = require('chalk')
 const { ethers, getNamedAccounts, getChainId } = require('hardhat')
 
+const { getCanisNFT } = require('../utils/helpers')
 const { dim, green, yellow, cyan } = require('../utils/utils')
 const posters = require('../metadata/posters')
 const config = require('../config')
@@ -12,12 +13,9 @@ async function main() {
   canisNFT = await ethers.getContract('CanisNFT', deployer)
 
   dim('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-  dim(` CanisNFT Contracts - Mint Posters `)
+  dim(` CanisNFT Contracts - TokenUri `)
   dim('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n')
-  /*
-    const feeData = await ethers.provider.getFeeData();
-    console.log(feeData)
-  */
+
   const name = await this.canisNFT.name()
   const symbol = await this.canisNFT.symbol()
   const cap = await this.canisNFT.CAP()
@@ -27,31 +25,15 @@ async function main() {
   const contractUri = await this.canisNFT.contractURI()
   const owner = await this.canisNFT.owner()
 
-  yellow(`\nCurrent status...`)
+  yellow(`\nTokenUris...`)
 
-  cyan(`name: ${name}`)
-  cyan(`symbol: ${symbol}`)
-  cyan(`cap: ${cap.toNumber()}`)
-  cyan(`receiver: ${receiver}`)
-  cyan(`royaltyAmount: ${royaltyAmount.toNumber()}`)
-  cyan(`startGiftingIndex: ${startGiftingIndex.toNumber()}`)
-  cyan(`endGiftingIndex: ${endGiftingIndex.toNumber()}`)
-  cyan(`contractUri: ${contractUri}`)
-  cyan(`owner: ${owner}`)
-
-  yellow(`\nsafeMintBatch: ${endGiftingIndex.toNumber()}`)
-  await canisNFT.safeMintBatch(endGiftingIndex.toNumber())
-
-  yellow(`\setTokenURI from tokenId 1 to ${endGiftingIndex.toNumber()}`)
-  for (let i = 1; i <= endGiftingIndex.toNumber(); i = i + 3) {
-    await canisNFT.setTokenURI(i, posters["poster-en"].ipfs)
-    await canisNFT.setTokenURI(i + 1, posters["poster-es"].ipfs)
-    await canisNFT.setTokenURI(i + 2, posters["poster-pt"].ipfs)
-    cyan(`tokenId ${i}, ${i + 1}, ${i + 2} tokenURI setted`)
+  for (let i = 1; i <= 150; i++) {
+    const tokenURI = await canisNFT.tokenURI(i);
+    cyan(`tokenId: ${i} - tokenURI: ${tokenURI}`)
   }
 
   dim('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-  green('CanisNFT Contracts - Mint Posters Complete!')
+  green('CanisNFT Contracts - TokenUri Complete!')
   dim('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n')
 }
 

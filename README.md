@@ -43,19 +43,19 @@ We use [Hardhat](https://hardhat.dev) and [hardhat-deploy](https://github.com/wi
 To run unit & integration tests:
 
 ```sh
-$ yarn test
+yarn test
 ```
 
 To run coverage:
 
 ```sh
-$ yarn coverage
+yarn coverage
 ```
 
 To run fuzz tests:
 
 ```sh
-$ yarn echidna
+yarn echidna
 ```
 
 ### Linter
@@ -65,7 +65,7 @@ We use [solhint](https://github.com/protofire/solhint)
 To lint the code, run:
 
 ```sh
-$ yarn hint
+yarn hint
 ```
 
 ## Deployment
@@ -96,7 +96,7 @@ yarn console --network localhost
 Copy over .envrc.example to .envrc
 
 ```
-$ cp .envrc.example .envrc
+cp .envrc.example .envrc
 ```
 
 Make sure to update the enviroment variables with suitable values.
@@ -104,16 +104,28 @@ Make sure to update the enviroment variables with suitable values.
 Now enable the env vars using [direnv](https://direnv.net/docs/installation.html)
 
 ```
-$ direnv allow
+direnv allow
 ```
 
 Now deploy to a network like so:
 
 ```
-yarn deploy rinkeby
-yarn deploy mainnet
-yarn deploy fuji
-yarn deploy avalanche
+yarn deploy:node goerli
+yarn deploy:node mainnet
+yarn deploy:node fuji
+yarn deploy:node avalanche
+```
+
+### Run script
+
+```sh
+npx hardhat run --network goerli scripts/mint.js
+npx hardhat run --network goerli scripts/tokenUri.js
+```
+
+```sh
+npx hardhat run --network fuji scripts/mint.js
+npx hardhat run --network fuji scripts/tokenUri.js
 ```
 
 It will update the `deployments/` dir.

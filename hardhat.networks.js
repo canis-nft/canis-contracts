@@ -53,8 +53,14 @@ if (process.env.HDWALLET_MNEMONIC || process.env.PRIVATE_KEY) {
     chainId: 43113,
     url: 'https://api.avax-test.network/ext/bc/C/rpc',
     accounts,
+    gas: 2100000,
+    gasPrice: 50000000000,
+    maxPriorityFeePerGas: 2000000000,
+    maxFeePerGas: 51500000000
   };
 }
+
+//blockGasLimit: 100000,
 
 if (process.env.POLYGONSCAN_API_KEY && (process.env.HDWALLET_MNEMONIC || process.env.PRIVATE_KEY)) {
   networks.matic = {
@@ -67,19 +73,11 @@ if (process.env.POLYGONSCAN_API_KEY && (process.env.HDWALLET_MNEMONIC || process
 }
 
 if (process.env.INFURA_API_KEY && (process.env.HDWALLET_MNEMONIC || process.env.PRIVATE_KEY)) {
-  networks.kovan = {
-    url: `https://kovan.infura.io/v3/${process.env.INFURA_API_KEY}`,
-    accounts
-  }
 
-  networks.ropsten = {
-    url: `https://ropsten.infura.io/v3/${process.env.INFURA_API_KEY}`,
-    accounts
-  }
-
-  networks.rinkeby = {
-    url: `https://rinkeby.infura.io/v3/${process.env.INFURA_API_KEY}`,
-    accounts
+  networks.goerli = {
+    url: `https://goerli.infura.io/v3/${process.env.INFURA_API_KEY}`,
+    accounts,
+    blockGasLimit: 100000,
   }
 
   networks.mainnet = {
