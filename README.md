@@ -144,6 +144,8 @@ yarn ipfs:images
 yarn ipfs:metadata
 ```
 
+* Both commands will generate a file called *metada.car* and *images.car* packed and ready to be uploaded to your ipfs storage service. 
+
 ## OpenSea Royalty integration
 
 For instance, check [here](https://ipfs.io/ipfs/QmbBXi3zGaFZ4S2cAea56cGhpD6eSRNL9b6BCUnrTpukT6)

@@ -7,11 +7,15 @@ import "./interfaces/IUniswap.sol";
 import "./interfaces/IUBI.sol";
 import "hardhat/console.sol";
 
+/// @title Canis Swap and Burn
+/// @notice contract that swaps native currency for UBI and burns it
+/// @author Think and Dev
 contract SwapBurner is Ownable {
-    /// @dev address of the uniswap router.
+    /// @dev address of the uniswap router
     address public Uniswap;
-    /// @dev address of the UBI token.
+    /// @dev address of the UBI token
     address public immutable UBI;
+    /// @dev deadline to make the swap in UniSwap
     uint256 public swapDeadline;
 
     event Initialized(address indexed uniswapRouter, address indexed ubiToken, uint256 swapDeadline);
@@ -30,6 +34,10 @@ contract SwapBurner is Ownable {
         _;
     }
 
+    /// @notice Init contract
+    /// @param _uniswapRouter address of Uniswap Router
+    /// @param _ubiToken address of UBI token
+    /// @param _swapDeadline deadline for swaps
     constructor(
         address _uniswapRouter,
         address _ubiToken,
@@ -47,23 +55,32 @@ contract SwapBurner is Ownable {
     /********** GETTERS ***********/
 
     /********** SETTERS ***********/
+
+    /// @notice Approve UniswapRouter to take tokens
+    /// @param amount amount of tokens to approve to Uniswap
     function approveUniSwap(uint256 amount) external onlyOwner {
         IUBI(UBI).approve(Uniswap, amount);
         emit UniswapApproved(amount);
     }
 
+    /// @notice Increase amount of approved tokens to UniswapRouter
+    /// @param amount amount of tokens to approve to Uniswap
     function increaseUniswapAllowance(uint256 amount) external onlyOwner {
         uint256 oldAllowance = IUBI(UBI).allowance(address(this), Uniswap);
         require(IUBI(UBI).increaseAllowance(Uniswap, amount) == true, "UBI INCREAS ALLOWANCE WENT WRONG");
         emit UniswapAllowanceUpdated(oldAllowance, amount);
     }
 
+    /// @notice Decrease amount of approved tokens to UniswapRouter
+    /// @param amount amount of tokens to approve to Uniswap
     function decreaseUniswapAllowance(uint256 amount) external onlyOwner {
         uint256 oldAllowance = IUBI(UBI).allowance(address(this), Uniswap);
         require(IUBI(UBI).decreaseAllowance(Uniswap, amount) == true, "UBI DECREASE ALLOWANCE WENT WRONG");
         emit UniswapAllowanceUpdated(oldAllowance, amount);
     }
 
+    /// @notice Modifiy deadline for swaps in swapRouter
+    /// @param newDeadline new deadline for swaps
     function setSwapDeadline(uint256 newDeadline) external onlyOwner {
         uint256 oldDeadline = swapDeadline;
         swapDeadline = newDeadline;
@@ -72,6 +89,8 @@ contract SwapBurner is Ownable {
 
     /********** INTERFACE ***********/
 
+    /// @notice Given a value of ETH, know the amount of UBI it is equal to
+    /// @param ethAmount eth amount to be converted to UBI
     function getEstimatedUBIforETH(uint256 ethAmount) internal view returns (uint256[] memory) {
         address[] memory path = new address[](2);
         path[0] = IUniswapV2(Uniswap).WETH();
@@ -80,6 +99,7 @@ contract SwapBurner is Ownable {
         return IUniswapV2(Uniswap).getAmountsOut(ethAmount, path);
     }
 
+    /// @notice Swap ETH for UBI and Burn it
     function receiveSwapAndBurn() external payable returns (uint256[] memory amounts) {
         address[] memory path = new address[](2);
         path[0] = IUniswapV2(Uniswap).WETH();
@@ -107,7 +127,7 @@ contract SwapBurner is Ownable {
     }
 
     /**
-     * Receive function to allow to UniswapRouter to transfer dust eth and be recieved by contract.
+     * @notice Receive function to allow to UniswapRouter to transfer dust eth and be recieved by contract.
      */
     receive() external payable {}
 }
