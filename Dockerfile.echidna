@@ -1,0 +1,4 @@
+FROM trailofbits/eth-security-toolbox
+WORKDIR /src
+RUN solc-select install 0.8.9
+ENTRYPOINT /usr/local/bin/echidna-test . --config echidna.yaml
